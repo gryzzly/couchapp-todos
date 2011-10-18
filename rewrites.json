@@ -1,0 +1,14 @@
+[{
+  "from" : "/todos/:host",
+  "to" : "_show/todos/:host",
+  "method" : "GET"
+},{
+  "from" : "/todos/:host",
+  "to" : "_update/todos/:host",
+  "method" : "PUT"
+},{
+  "from" : "/todos/:host",
+  "to" : "_update/todos/:host",
+  "method" : "POST"
+}]
+
