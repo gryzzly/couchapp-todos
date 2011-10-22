@@ -10,5 +10,16 @@
   "from" : "/todos/:host",
   "to" : "_update/todos/:host",
   "method" : "POST"
+},{
+  "from" : "/todos/:host",
+  "to" : "../../../todos/:host",
+  "method" : "DELETE"
+},{
+  "from" : "/todos/:host/:item",
+  "to" : "_show/todos/:host",
+  "method" : "GET"
+},{
+  "from" : "/todos/:host/:item",
+  "to" : "_update/todos/:host",
+  "method" : "PUT"
 }]
-
