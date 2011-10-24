@@ -1,8 +1,17 @@
 [{
+  "from" : "",
+  "to" : "../../../",
+  "method" : "GET"
+},{
+    "from" : ":db",
+    "to" : "../../../:db",
+    "method" : "GET"
+},{
   "from" : "/todos/:host",
   "to" : "_show/todos/:host",
   "method" : "GET"
 },{
+  "comment" : "Create new set of todos (if data is submitted add todo/s)",
   "from" : "/todos/:host",
   "to" : "_update/todos/:host",
   "method" : "PUT"
