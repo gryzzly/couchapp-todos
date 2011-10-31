@@ -7,19 +7,22 @@
     "to" : "../../../:db",
     "method" : "GET"
 },{
+  "comment" : "Get the host related document containing todos as an array "
   "from" : "/todos/:host",
   "to" : "_show/todos/:host",
   "method" : "GET"
 },{
-  "comment" : "Create new set of todos (if data is submitted add todo/s)",
+  "comment" : "Create / replace set of todos (if data is submitted add todo/s)",
   "from" : "/todos/:host",
   "to" : "_update/todos/:host",
   "method" : "PUT"
 },{
+  "comment" : "Add new todo item to the collection"
   "from" : "/todos/:host",
   "to" : "_update/todos/:host",
   "method" : "POST"
 },{
+  "comment" : "Remove todos for this host"
   "from" : "/todos/:host",
   "to" : "../../../todos/:host",
   "method" : "DELETE"

@@ -13,9 +13,12 @@
 //
 function ( doc, req ) {
   var responseDoc = {}, 
-      data,
-      isEmpty, typeOf, isValidJSON, todo;
+      data, todo,
+      isEmpty, typeOf, isValidJSON, handleData;
   
+  // Determine if object is empty? (has no keys and values)
+  // @param {Object} obj
+  // @returns {Boolean}
   isEmpty = function ( obj ) {
     for ( var key in obj ) {
       if ( ({}).hasOwnProperty.call({}, key) ) return false;
@@ -23,10 +26,14 @@ function ( doc, req ) {
     return true;
   };
   
+  // Determine the type of the argument
+  // @param {*} obj
+  // @returns {String} Capitalized type of the argument (Array, Number etc.)
   typeOf = function ( obj ) {
     return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
   };
   
+  // Is `json` valid?
   isValidJSON = function ( json ) {
     try {
       JSON.parse ( json );
@@ -36,47 +43,49 @@ function ( doc, req ) {
     return true;
   };
   
+  // When data is an object, put it in array
+  // Assign ids to all objects based on the last todo item if it exists.
+  // @param {Object|Array} data 
+  // @param {Object} doc
+  // @returns {Array}
+  handleData = function ( data, doc ) {
+    // calculate the starting id
+    var baseId = 0;
+    // updating existing doc
+    if ( doc ) {
+      // at this point doc may not yet have any todos
+      if ( doc.todos.length !== 0 ) baseId = doc.todos.slice(-1)[0]._id + 1
+    }
+    if ( typeOf ( data ) === 'object' ) {
+      data._id = baseId;
+      data = [ data ];
+    }
+    if ( typeOf ( data ) === 'array' ) {
+      data.forEach ( function ( todo, index ) {
+        todo._id = baseId + index;
+      } );
+    }
+    return data;
+  };
+  
   // new document
   // PUTting twice should have the same result as PUTting once
   if ( !doc || ( doc && req.method === "PUT" ) ) {
     responseDoc = {
       _id : req.id,
       todos : [],
+      // a hack to have rev set to something
+      // so CouchDB won't complain
       _rev : ( doc && doc._rev ) || "0-0"
     };
-    
-    data = isValidJSON ( req.body ) ? JSON.parse ( req.body ) : void 0;
-  
-    if ( data ) {
-      if ( typeOf ( data ) === 'object' ) {
-        // assign an id
-        data._id = 0;
-        // turn data into an array
-        data = [ data ];
-      }
-      if ( typeOf ( data ) === 'array' ) {
-        // assign ids for each of the items
-        data.forEach( function ( todo, _i ) {
-          todo._id = _i;
-        } );
-      }
-      responseDoc.todos = responseDoc.todos.concat ( data );
-    }
   }
   // updating existing document (adding new todo item) 
-  // TODO: handle adding multiple items
   else {
     responseDoc = doc;
-    todo = JSON.parse ( req.body );
-    // FIXME: find out why not sending any data causes `req.body` 
-    //        to turn into "undefined"
-    if ( todo && todo !== 'undefined' ) {
-      // increment the last todo's id
-      todo._id = typeOf ( doc.todos.slice(-1)[0] ) === 'number' ? 
-                 doc.todos.slice(-1)[0] + 1 : 
-                 0;
-      responseDoc.todos.push ( todo );
-    }
+  }
+  
+  if ( data = isValidJSON ( req.body ) ? JSON.parse ( req.body ) : void 0 ) {
+    responseDoc.todos = responseDoc.todos.concat ( handleData ( data, responseDoc ) );
   }
   // return saved document
   return [ responseDoc, JSON.stringify ( responseDoc ) ];
